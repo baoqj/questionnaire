@@ -121,7 +121,7 @@ public
 
 # Custom directories to ignore
 prompt/
-UI/
+/UI/
 Ver01/
 
 # Archive files
