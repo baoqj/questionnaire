@@ -1,5 +1,7 @@
 .gitignore
 *.bak
+.env.example
+*.zip
 
 # Dependencies
 node_modules/
