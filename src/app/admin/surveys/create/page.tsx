@@ -50,6 +50,9 @@ export default function CreateSurveyPage() {
           name: '单选题',
           description: '用户只能选择一个选项',
           type: 'single_choice',
+          icon: '🔘',
+          template: {},
+          validation: {},
           defaultOptions: [
             { id: generateId(), label: '选项A', value: 'A', score: 1, questionId: '' },
             { id: generateId(), label: '选项B', value: 'B', score: 2, questionId: '' }
@@ -60,6 +63,9 @@ export default function CreateSurveyPage() {
           name: '多选题',
           description: '用户可以选择多个选项',
           type: 'multiple_choice',
+          icon: '☑️',
+          template: {},
+          validation: {},
           defaultOptions: [
             { id: generateId(), label: '选项A', value: 'A', score: 1, questionId: '' },
             { id: generateId(), label: '选项B', value: 'B', score: 2, questionId: '' }
@@ -70,6 +76,9 @@ export default function CreateSurveyPage() {
           name: '简答题',
           description: '用户输入文本回答',
           type: 'text',
+          icon: '📝',
+          template: {},
+          validation: {},
           defaultOptions: []
         },
         {
@@ -77,6 +86,9 @@ export default function CreateSurveyPage() {
           name: '量表题',
           description: '用户在量表上选择评分',
           type: 'scale',
+          icon: '📊',
+          template: {},
+          validation: {},
           defaultOptions: []
         }
       ];
