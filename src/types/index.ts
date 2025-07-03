@@ -184,6 +184,7 @@ export interface QuestionTemplate {
   icon: string;
   template: any;
   validation: any;
+  defaultOptions?: Option[];
 }
 
 // 管理员相关类型
