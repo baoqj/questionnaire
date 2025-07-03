@@ -1,0 +1,290 @@
+{
+  "id": "bank_crs_01",
+  "title": "CRS合规风险自测",
+  "description": "跨境合规智能分析，帮助您了解CRS合规风险",
+  "category": "合规风险",
+  "version": "1.0",
+  "createdAt": "2024-01-01",
+  "estimatedTime": "5-8分钟",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "title": "您是否持有以下类型的海外金融账户？",
+      "required": true,
+      "options": [
+        {
+          "value": "personal_bank",
+          "text": "个人名义的银行账户"
+        },
+        {
+          "value": "personal_securities",
+          "text": "个人名义的券商账户"
+        },
+        {
+          "value": "insurance_policy",
+          "text": "海外保险保单账户（储蓄险、年金等）"
+        },
+        {
+          "value": "trust_company",
+          "text": "海外信托或公司名义账户"
+        },
+        {
+          "value": "crypto_metals",
+          "text": "加密货币或贵金属账户（非银行持有）"
+        },
+        {
+          "value": "none",
+          "text": "没有任何账户"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "type": "single_choice",
+      "title": "您的资产是否由以下架构持有？",
+      "required": true,
+      "options": [
+        {
+          "value": "personal_direct",
+          "text": "个人直接持有"
+        },
+        {
+          "value": "offshore_company",
+          "text": "由离岸公司持有(BVI, Cayman等)"
+        },
+        {
+          "value": "trust",
+          "text": "由信托持有"
+        },
+        {
+          "value": "foundation",
+          "text": "由基金会持有"
+        },
+        {
+          "value": "holding_platform",
+          "text": "由控股平台或合伙企业持有"
+        },
+        {
+          "value": "uncertain",
+          "text": "不确定"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "title": "您是否填写过以下与税务居民身份有关的表格？",
+      "required": true,
+      "options": [
+        {
+          "value": "w8ben",
+          "text": "W-8BEN / W-8BEN-E"
+        },
+        {
+          "value": "crs_self_cert",
+          "text": "CRS自我声明表（Self-Certification）"
+        },
+        {
+          "value": "fatca",
+          "text": "FATCA文件"
+        },
+        {
+          "value": "none_unclear",
+          "text": "没填写过或不清楚"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "type": "single_choice",
+      "title": "您是否曾收到过银行或机构有关CRS申报的通知？",
+      "required": true,
+      "options": [
+        {
+          "value": "received_reviewed",
+          "text": "收到过，且认真查看"
+        },
+        {
+          "value": "received_ignored",
+          "text": "收到过，但未关注"
+        },
+        {
+          "value": "uncertain",
+          "text": "不确定是否收到"
+        },
+        {
+          "value": "never_received",
+          "text": "从未收到过"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "type": "single_choice",
+      "title": "您是否曾被要求补充与账户或架构相关的税务信息？",
+      "required": true,
+      "options": [
+        {
+          "value": "frequently",
+          "text": "经常被问"
+        },
+        {
+          "value": "occasionally",
+          "text": "偶尔被问"
+        },
+        {
+          "value": "never",
+          "text": "从未被问"
+        },
+        {
+          "value": "unclear",
+          "text": "不清楚"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "type": "single_choice",
+      "title": "您是否知道哪些账户最容易触发CRS穿透？",
+      "required": true,
+      "options": [
+        {
+          "value": "clear_knowledge",
+          "text": "清楚知道（例如个人持有账户）"
+        },
+        {
+          "value": "vague_understanding",
+          "text": "模糊了解"
+        },
+        {
+          "value": "no_understanding",
+          "text": "完全不了解"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "type": "single_choice",
+      "title": "您控制或设立的海外公司是否有实质运营？",
+      "required": true,
+      "options": [
+        {
+          "value": "real_business",
+          "text": "有员工与客户，真实经营"
+        },
+        {
+          "value": "accounting_only",
+          "text": "有账务无实质运营"
+        },
+        {
+          "value": "investment_only",
+          "text": "完全未经营，仅投资用"
+        },
+        {
+          "value": "unclear",
+          "text": "不清楚"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "type": "single_choice",
+      "title": "当前架构主要收入来源是？",
+      "required": true,
+      "options": [
+        {
+          "value": "business_income",
+          "text": "营业收入（贸易、服务）"
+        },
+        {
+          "value": "investment_income",
+          "text": "投资红利/利息"
+        },
+        {
+          "value": "capital_gains",
+          "text": "股权转让收益/租金"
+        },
+        {
+          "value": "consulting_fees",
+          "text": "跨境咨询费/技术转让费"
+        },
+        {
+          "value": "no_income",
+          "text": "无收入或空壳公司"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "type": "single_choice",
+      "title": "您了解您名下实体在CRS下的分类吗？",
+      "required": true,
+      "options": [
+        {
+          "value": "financial_institution",
+          "text": "金融机构（FI）"
+        },
+        {
+          "value": "active_nfe",
+          "text": "积极非金融机构（Active NFE）"
+        },
+        {
+          "value": "passive_nfe",
+          "text": "消极非金融机构（Passive NFE）"
+        },
+        {
+          "value": "unclear",
+          "text": "不清楚"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "type": "single_choice",
+      "title": "架构是否设在以下高CRS敏感法域？",
+      "required": true,
+      "options": [
+        {
+          "value": "difc_adgm",
+          "text": "DIFC / ADGM"
+        },
+        {
+          "value": "singapore_hk",
+          "text": "新加坡/香港"
+        },
+        {
+          "value": "bvi_cayman",
+          "text": "BVI / Cayman"
+        },
+        {
+          "value": "china_mainland",
+          "text": "中国大陆"
+        },
+        {
+          "value": "other",
+          "text": "其他"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "riskLevels": {
+      "low": {
+        "range": [0, 30],
+        "title": "低风险",
+        "description": "您的CRS合规风险相对较低，但仍需关注相关法规变化。"
+      },
+      "medium": {
+        "range": [31, 60],
+        "title": "中等风险",
+        "description": "您存在一定的CRS合规风险，建议咨询专业人士进行风险评估。"
+      },
+      "high": {
+        "range": [61, 100],
+        "title": "高风险",
+        "description": "您的CRS合规风险较高，强烈建议立即寻求专业合规咨询。"
+      }
+    }
+  }
+}

@@ -1,0 +1,374 @@
+{
+  "id": "ai_survey_001",
+  "title": "AI技术认知与态度调查",
+  "description": "本调查旨在了解公众对人工智能技术的认知水平、使用态度和未来期望",
+  "version": "1.0",
+  "created_at": "2024-07-01T00:00:00Z",
+  "estimated_time": 8,
+  "category": "technology",
+  "tags": ["AI", "technology", "survey", "public_opinion"],
+  "settings": {
+    "allow_anonymous": true,
+    "require_completion": false,
+    "randomize_options": false,
+    "show_progress": true,
+    "enable_ai_assistance": true
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "type": "single_choice",
+      "title": "您的年龄段是？",
+      "description": "请选择您所在的年龄段",
+      "required": true,
+      "options": [
+        {
+          "id": "age_18_25",
+          "text": "18-25岁",
+          "value": "18-25"
+        },
+        {
+          "id": "age_26_35",
+          "text": "26-35岁",
+          "value": "26-35"
+        },
+        {
+          "id": "age_36_45",
+          "text": "36-45岁",
+          "value": "36-45"
+        },
+        {
+          "id": "age_46_55",
+          "text": "46-55岁",
+          "value": "46-55"
+        },
+        {
+          "id": "age_55_plus",
+          "text": "55岁以上",
+          "value": "55+"
+        }
+      ],
+      "ai_context": "年龄信息有助于分析不同年龄群体对AI技术的接受度差异"
+    },
+    {
+      "id": "q2",
+      "type": "single_choice",
+      "title": "您的职业类型是？",
+      "description": "请选择最符合您当前情况的职业类型",
+      "required": true,
+      "options": [
+        {
+          "id": "student",
+          "text": "学生",
+          "value": "student"
+        },
+        {
+          "id": "employee",
+          "text": "企业员工",
+          "value": "employee"
+        },
+        {
+          "id": "freelancer",
+          "text": "自由职业者",
+          "value": "freelancer"
+        },
+        {
+          "id": "manager",
+          "text": "企业管理者",
+          "value": "manager"
+        },
+        {
+          "id": "retired",
+          "text": "退休人员",
+          "value": "retired"
+        },
+        {
+          "id": "other",
+          "text": "其他",
+          "value": "other"
+        }
+      ],
+      "ai_context": "职业背景将影响对AI技术在工作场景中应用的理解和需求"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "title": "您平时使用哪些社交媒体平台？",
+      "description": "可以选择多个选项",
+      "required": true,
+      "min_selections": 1,
+      "max_selections": null,
+      "options": [
+        {
+          "id": "wechat",
+          "text": "微信",
+          "value": "wechat"
+        },
+        {
+          "id": "weibo",
+          "text": "微博",
+          "value": "weibo"
+        },
+        {
+          "id": "douyin",
+          "text": "抖音",
+          "value": "douyin"
+        },
+        {
+          "id": "qq",
+          "text": "QQ",
+          "value": "qq"
+        },
+        {
+          "id": "xiaohongshu",
+          "text": "小红书",
+          "value": "xiaohongshu"
+        },
+        {
+          "id": "bilibili",
+          "text": "B站",
+          "value": "bilibili"
+        },
+        {
+          "id": "zhihu",
+          "text": "知乎",
+          "value": "zhihu"
+        },
+        {
+          "id": "other_social",
+          "text": "其他",
+          "value": "other"
+        }
+      ],
+      "ai_context": "社交媒体使用习惯反映了用户的数字化程度和信息获取偏好"
+    },
+    {
+      "id": "q4",
+      "type": "scale",
+      "title": "您对人工智能技术的了解程度如何？",
+      "description": "请在1-5的量表上选择最符合您情况的选项",
+      "required": true,
+      "scale": {
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "labels": {
+          "1": "完全不了解",
+          "2": "略有了解",
+          "3": "一般了解",
+          "4": "比较了解",
+          "5": "非常了解"
+        }
+      },
+      "ai_context": "AI知识水平将影响后续问题的复杂度和分析深度"
+    },
+    {
+      "id": "q5",
+      "type": "single_choice",
+      "title": "您认为AI技术对社会的影响是？",
+      "description": "请选择您对AI技术总体影响的看法",
+      "required": true,
+      "options": [
+        {
+          "id": "very_positive",
+          "text": "非常积极",
+          "value": "very_positive"
+        },
+        {
+          "id": "positive",
+          "text": "比较积极",
+          "value": "positive"
+        },
+        {
+          "id": "neutral",
+          "text": "中性",
+          "value": "neutral"
+        },
+        {
+          "id": "negative",
+          "text": "比较消极",
+          "value": "negative"
+        },
+        {
+          "id": "very_negative",
+          "text": "非常消极",
+          "value": "very_negative"
+        },
+        {
+          "id": "uncertain",
+          "text": "不确定",
+          "value": "uncertain"
+        }
+      ],
+      "ai_context": "对AI的总体态度是分析用户接受度的重要指标"
+    },
+    {
+      "id": "q6",
+      "type": "text",
+      "title": "请简述您对未来AI发展的期望或担忧",
+      "description": "请用您自己的话描述对AI技术发展的看法（可选）",
+      "required": false,
+      "validation": {
+        "min_length": 0,
+        "max_length": 500
+      },
+      "placeholder": "请在此输入您的想法...",
+      "ai_context": "开放性回答提供了定量分析无法捕捉的深层观点和情感"
+    },
+    {
+      "id": "q7",
+      "type": "single_choice",
+      "title": "您最希望AI技术在哪个领域得到应用？",
+      "description": "请选择您认为最重要的应用领域",
+      "required": true,
+      "options": [
+        {
+          "id": "healthcare",
+          "text": "医疗健康",
+          "value": "healthcare"
+        },
+        {
+          "id": "education",
+          "text": "教育培训",
+          "value": "education"
+        },
+        {
+          "id": "transportation",
+          "text": "交通出行",
+          "value": "transportation"
+        },
+        {
+          "id": "finance",
+          "text": "金融服务",
+          "value": "finance"
+        },
+        {
+          "id": "entertainment",
+          "text": "娱乐休闲",
+          "value": "entertainment"
+        },
+        {
+          "id": "productivity",
+          "text": "工作效率",
+          "value": "productivity"
+        },
+        {
+          "id": "environment",
+          "text": "环境保护",
+          "value": "environment"
+        }
+      ],
+      "ai_context": "应用领域偏好反映了用户的价值观和关注重点"
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "title": "您在使用智能产品时最关心哪些方面？",
+      "description": "可以选择多个选项",
+      "required": true,
+      "min_selections": 1,
+      "max_selections": null,
+      "options": [
+        {
+          "id": "functionality",
+          "text": "功能实用性",
+          "value": "functionality"
+        },
+        {
+          "id": "usability",
+          "text": "操作简便性",
+          "value": "usability"
+        },
+        {
+          "id": "security",
+          "text": "数据安全性",
+          "value": "security"
+        },
+        {
+          "id": "price",
+          "text": "价格合理性",
+          "value": "price"
+        },
+        {
+          "id": "brand",
+          "text": "品牌可信度",
+          "value": "brand"
+        },
+        {
+          "id": "technology",
+          "text": "技术先进性",
+          "value": "technology"
+        },
+        {
+          "id": "support",
+          "text": "售后服务",
+          "value": "support"
+        }
+      ],
+      "ai_context": "产品关注点反映了用户的决策优先级和风险偏好"
+    },
+    {
+      "id": "q9",
+      "type": "scale",
+      "title": "您对数据隐私保护的重视程度如何？",
+      "description": "请在1-5的量表上选择最符合您情况的选项",
+      "required": true,
+      "scale": {
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "labels": {
+          "1": "不重视",
+          "2": "略微重视",
+          "3": "一般重视",
+          "4": "比较重视",
+          "5": "非常重视"
+        }
+      },
+      "ai_context": "隐私态度是评估用户对AI服务接受度的关键因素"
+    },
+    {
+      "id": "q10",
+      "type": "single_choice",
+      "title": "您愿意参与AI产品的测试和反馈吗？",
+      "description": "这是最后一个问题，感谢您的参与",
+      "required": true,
+      "options": [
+        {
+          "id": "very_willing",
+          "text": "非常愿意",
+          "value": "very_willing"
+        },
+        {
+          "id": "willing",
+          "text": "比较愿意",
+          "value": "willing"
+        },
+        {
+          "id": "maybe",
+          "text": "可能会考虑",
+          "value": "maybe"
+        },
+        {
+          "id": "unwilling",
+          "text": "不太愿意",
+          "value": "unwilling"
+        },
+        {
+          "id": "very_unwilling",
+          "text": "完全不愿意",
+          "value": "very_unwilling"
+        }
+      ],
+      "ai_context": "参与意愿反映了用户对AI技术的开放程度和合作态度"
+    }
+  ],
+  "analysis_prompts": {
+    "user_profile": "基于用户的年龄、职业、AI知识水平和态度，分析其用户画像特征",
+    "technology_acceptance": "分析用户对AI技术的接受度，包括影响因素和潜在障碍",
+    "privacy_concerns": "评估用户的隐私保护意识和对数据安全的关注程度",
+    "application_preferences": "分析用户对AI应用领域的偏好和期望",
+    "behavioral_insights": "基于社交媒体使用和产品关注点，分析用户的数字化行为特征",
+    "recommendations": "为用户提供个性化的AI技术学习和使用建议"
+  }
+}

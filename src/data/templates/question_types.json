@@ -1,0 +1,251 @@
+{
+  "question_types": {
+    "single_choice": {
+      "name": "单选题",
+      "description": "用户只能选择一个选项",
+      "icon": "fas fa-dot-circle",
+      "template": {
+        "type": "single_choice",
+        "title": "",
+        "description": "",
+        "required": true,
+        "options": [
+          {
+            "id": "option_1",
+            "text": "选项1",
+            "value": "option_1"
+          }
+        ]
+      },
+      "validation": {
+        "min_options": 2,
+        "max_options": 10,
+        "required_fields": ["title", "options"]
+      }
+    },
+    "multiple_choice": {
+      "name": "多选题",
+      "description": "用户可以选择多个选项",
+      "icon": "fas fa-check-square",
+      "template": {
+        "type": "multiple_choice",
+        "title": "",
+        "description": "",
+        "required": true,
+        "min_selections": 1,
+        "max_selections": null,
+        "options": [
+          {
+            "id": "option_1",
+            "text": "选项1",
+            "value": "option_1"
+          }
+        ]
+      },
+      "validation": {
+        "min_options": 2,
+        "max_options": 15,
+        "required_fields": ["title", "options", "min_selections"]
+      }
+    },
+    "text": {
+      "name": "简答题",
+      "description": "用户可以输入文本回答",
+      "icon": "fas fa-edit",
+      "template": {
+        "type": "text",
+        "title": "",
+        "description": "",
+        "required": false,
+        "validation": {
+          "min_length": 0,
+          "max_length": 500
+        },
+        "placeholder": "请在此输入您的答案..."
+      },
+      "validation": {
+        "required_fields": ["title"],
+        "max_length_limit": 2000
+      }
+    },
+    "scale": {
+      "name": "量表题",
+      "description": "用户在数值范围内选择",
+      "icon": "fas fa-sliders-h",
+      "template": {
+        "type": "scale",
+        "title": "",
+        "description": "",
+        "required": true,
+        "scale": {
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "labels": {
+            "1": "非常不同意",
+            "2": "不同意",
+            "3": "中立",
+            "4": "同意",
+            "5": "非常同意"
+          }
+        }
+      },
+      "validation": {
+        "min_range": 2,
+        "max_range": 10,
+        "required_fields": ["title", "scale"]
+      }
+    },
+    "rating": {
+      "name": "评分题",
+      "description": "用户给出星级评分",
+      "icon": "fas fa-star",
+      "template": {
+        "type": "rating",
+        "title": "",
+        "description": "",
+        "required": true,
+        "rating": {
+          "max_stars": 5,
+          "allow_half": false
+        }
+      },
+      "validation": {
+        "max_stars_limit": 10,
+        "required_fields": ["title", "rating"]
+      }
+    },
+    "matrix": {
+      "name": "矩阵题",
+      "description": "多个问题使用相同的选项",
+      "icon": "fas fa-table",
+      "template": {
+        "type": "matrix",
+        "title": "",
+        "description": "",
+        "required": true,
+        "rows": [
+          {
+            "id": "row_1",
+            "text": "问题1"
+          }
+        ],
+        "columns": [
+          {
+            "id": "col_1",
+            "text": "选项1",
+            "value": "option_1"
+          }
+        ]
+      },
+      "validation": {
+        "min_rows": 2,
+        "max_rows": 10,
+        "min_columns": 2,
+        "max_columns": 7,
+        "required_fields": ["title", "rows", "columns"]
+      }
+    }
+  },
+  "survey_categories": [
+    {
+      "id": "technology",
+      "name": "科技调研",
+      "description": "关于技术产品、服务和趋势的调查",
+      "color": "#6366f1"
+    },
+    {
+      "id": "market_research",
+      "name": "市场调研",
+      "description": "产品市场需求和用户偏好调查",
+      "color": "#10b981"
+    },
+    {
+      "id": "customer_satisfaction",
+      "name": "客户满意度",
+      "description": "服务质量和客户体验评估",
+      "color": "#f59e0b"
+    },
+    {
+      "id": "employee_feedback",
+      "name": "员工反馈",
+      "description": "内部员工满意度和建议收集",
+      "color": "#ef4444"
+    },
+    {
+      "id": "academic_research",
+      "name": "学术研究",
+      "description": "科研项目和学术调查",
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "social_survey",
+      "name": "社会调查",
+      "description": "社会现象和公众意见调查",
+      "color": "#06b6d4"
+    },
+    {
+      "id": "health_wellness",
+      "name": "健康福祉",
+      "description": "健康状况和生活方式调查",
+      "color": "#84cc16"
+    },
+    {
+      "id": "education",
+      "name": "教育培训",
+      "description": "教学效果和学习需求调查",
+      "color": "#f97316"
+    }
+  ],
+  "ai_analysis_templates": {
+    "demographic_analysis": {
+      "name": "人口统计分析",
+      "prompt": "分析受访者的人口统计特征，包括年龄、性别、职业、教育背景等，并总结主要群体特征。"
+    },
+    "sentiment_analysis": {
+      "name": "情感态度分析",
+      "prompt": "分析受访者在开放性问题中表达的情感倾向，识别积极、消极和中性态度的分布。"
+    },
+    "preference_analysis": {
+      "name": "偏好行为分析",
+      "prompt": "基于选择题答案，分析受访者的偏好模式、行为特征和决策倾向。"
+    },
+    "correlation_analysis": {
+      "name": "关联性分析",
+      "prompt": "分析不同问题答案之间的关联性，发现潜在的模式和趋势。"
+    },
+    "segmentation_analysis": {
+      "name": "用户分群分析",
+      "prompt": "基于回答模式将受访者分为不同群体，并描述各群体的特征和差异。"
+    },
+    "recommendation_analysis": {
+      "name": "建议推荐分析",
+      "prompt": "基于调查结果，为不同类型的受访者提供个性化的建议和推荐。"
+    }
+  },
+  "validation_rules": {
+    "survey": {
+      "min_questions": 1,
+      "max_questions": 50,
+      "required_fields": ["title", "description", "questions"],
+      "title_max_length": 100,
+      "description_max_length": 500
+    },
+    "question": {
+      "title_max_length": 200,
+      "description_max_length": 300,
+      "option_text_max_length": 100
+    }
+  },
+  "default_settings": {
+    "allow_anonymous": true,
+    "require_completion": false,
+    "randomize_options": false,
+    "show_progress": true,
+    "enable_ai_assistance": true,
+    "collect_metadata": true,
+    "auto_save": true,
+    "response_limit": null,
+    "expiry_date": null
+  }
+}
