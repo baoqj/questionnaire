@@ -106,7 +106,15 @@ export class SurveyService {
       category: surveyData.category,
       version: surveyData.version || '1.0',
       estimatedTime: surveyData.estimatedTime || surveyData.estimated_time,
+      tags: surveyData.tags || [],
       questions,
+      settings: {
+        allowAnonymous: surveyData.settings?.allowAnonymous ?? true,
+        requireCompletion: surveyData.settings?.requireCompletion ?? false,
+        randomizeOptions: surveyData.settings?.randomizeOptions ?? false,
+        showProgress: surveyData.settings?.showProgress ?? true,
+        enableAiAssistance: surveyData.settings?.enableAiAssistance ?? true
+      },
       createdAt: new Date(surveyData.createdAt || surveyData.created_at || Date.now()),
       updatedAt: new Date(surveyData.updatedAt || surveyData.updated_at || Date.now())
     };

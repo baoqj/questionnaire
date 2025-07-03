@@ -167,6 +167,8 @@ export default function CreateSurveyPage() {
 
     const question: Question = {
       id: currentQuestion.id || generateId(),
+      surveyId: survey.id || '', // 将在保存问卷时更新
+      order: editingQuestionIndex !== null ? editingQuestionIndex + 1 : (survey.questions?.length || 0) + 1,
       type: currentQuestion.type!,
       content: currentQuestion.content,
       description: currentQuestion.description,
@@ -226,13 +228,26 @@ export default function CreateSurveyPage() {
     }
 
     try {
+      const surveyId = generateId();
+
+      // 更新所有问题的surveyId和order
+      const updatedQuestions: Question[] = (survey.questions || []).map((q, index) => ({
+        ...q,
+        surveyId: surveyId,
+        order: index + 1,
+        options: q.options.map(opt => ({
+          ...opt,
+          questionId: q.id
+        }))
+      }));
+
       const newSurvey: Survey = {
-        id: generateId(),
+        id: surveyId,
         title: survey.title,
         description: survey.description,
         category: survey.category || '未分类',
         estimatedTime: survey.estimatedTime || 5,
-        questions: survey.questions,
+        questions: updatedQuestions,
         createdAt: new Date(),
         updatedAt: new Date(),
         version: '1.0',
@@ -240,7 +255,9 @@ export default function CreateSurveyPage() {
         settings: {
           allowAnonymous: true,
           showProgress: true,
-          randomizeQuestions: false
+          randomizeOptions: false,
+          requireCompletion: false,
+          enableAiAssistance: true
         }
       };
 
