@@ -51,8 +51,8 @@ export default function CreateSurveyPage() {
           description: '用户只能选择一个选项',
           type: 'single_choice',
           defaultOptions: [
-            { id: generateId(), label: '选项A', score: 1 },
-            { id: generateId(), label: '选项B', score: 2 }
+            { id: generateId(), label: '选项A', value: 'A', score: 1, questionId: '' },
+            { id: generateId(), label: '选项B', value: 'B', score: 2, questionId: '' }
           ]
         },
         {
@@ -61,8 +61,8 @@ export default function CreateSurveyPage() {
           description: '用户可以选择多个选项',
           type: 'multiple_choice',
           defaultOptions: [
-            { id: generateId(), label: '选项A', score: 1 },
-            { id: generateId(), label: '选项B', score: 2 }
+            { id: generateId(), label: '选项A', value: 'A', score: 1, questionId: '' },
+            { id: generateId(), label: '选项B', value: 'B', score: 2, questionId: '' }
           ]
         },
         {
