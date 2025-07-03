@@ -112,7 +112,9 @@ export default function CreateSurveyPage() {
     const newOption: Option = {
       id: generateId(),
       label: '',
-      score: 1
+      value: '',
+      score: 1,
+      questionId: currentQuestion.id || ''
     };
     setCurrentQuestion(prev => ({
       ...prev,
@@ -209,7 +211,11 @@ export default function CreateSurveyPage() {
       content: '',
       description: '',
       required: true,
-      options: template.defaultOptions.map(opt => ({ ...opt, id: generateId() }))
+      options: template.defaultOptions.map(opt => ({
+        ...opt,
+        id: generateId(),
+        questionId: generateId() // 为新问题生成questionId
+      }))
     });
   };
 
