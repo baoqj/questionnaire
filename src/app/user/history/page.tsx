@@ -43,7 +43,10 @@ export default function UserHistoryPage() {
             const response = storage.get<Response>(key);
             if (response && response.userId === userId && response.completed) {
               // 获取对应的问卷信息
-              const survey = await SurveyService.getSurveyById(response.surveyId);
+              // 通过API获取问卷信息
+              const surveyResponse = await fetch(`/api/surveys/${response.surveyId}`);
+              const surveyData = await surveyResponse.json();
+              const survey = surveyData.success ? surveyData.data : null;
               allResponses.push({
                 ...response,
                 survey,

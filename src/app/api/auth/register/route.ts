@@ -130,8 +130,8 @@ export async function POST(request: NextRequest) {
       email: email?.trim() || '',
       password: password, // 在实际应用中应该加密存储
       role: 'user',
-      createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString()
+      createdAt: new Date(),
+      lastLoginAt: new Date()
     };
 
     // 添加到用户列表并保存
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
       user: {
         ...userWithoutPassword,
         createdAt: new Date(userWithoutPassword.createdAt),
-        lastLoginAt: new Date(newUser.lastLoginAt)
+        lastLoginAt: newUser.lastLoginAt || new Date()
       },
       message: '注册成功'
     });

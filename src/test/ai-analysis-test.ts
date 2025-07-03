@@ -9,20 +9,53 @@ const mockResponse: Response = {
   userId: 'test_user',
   answers: [
     {
+      id: 'answer_1',
+      responseId: 'test_response_001',
       questionId: 'q1',
-      value: ['personal_bank', 'personal_securities']
+      optionIds: ['personal_bank', 'personal_securities'],
+      question: {
+        id: 'q1',
+        surveyId: 'bank_crs_01',
+        order: 1,
+        type: 'multiple_choice',
+        content: '您是否持有以下类型的海外金融账户？',
+        required: true,
+        options: []
+      }
     },
     {
+      id: 'answer_2',
+      responseId: 'test_response_001',
       questionId: 'q2',
-      value: 'personal_direct'
+      optionId: 'personal_direct',
+      question: {
+        id: 'q2',
+        surveyId: 'bank_crs_01',
+        order: 2,
+        type: 'single_choice',
+        content: '您的资产是否由以下架构持有？',
+        required: true,
+        options: []
+      }
     },
     {
+      id: 'answer_3',
+      responseId: 'test_response_001',
       questionId: 'q3',
-      value: 'clear_understanding'
+      optionId: 'clear_understanding',
+      question: {
+        id: 'q3',
+        surveyId: 'bank_crs_01',
+        order: 3,
+        type: 'single_choice',
+        content: '您对CRS穿透规则的了解程度如何？',
+        required: true,
+        options: []
+      }
     }
   ],
-  completedAt: new Date(),
-  createdAt: new Date()
+  createdAt: new Date(),
+  completed: true
 };
 
 const mockSurveyData = {

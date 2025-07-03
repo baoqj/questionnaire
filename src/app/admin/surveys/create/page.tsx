@@ -165,12 +165,15 @@ export default function CreateSurveyPage() {
       return;
     }
 
+    // 确保type是有效的联合类型值
+    const questionType = currentQuestion.type as 'single_choice' | 'multiple_choice' | 'text' | 'scale' | 'rating' | 'matrix';
+
     const question: Question = {
       id: currentQuestion.id || generateId(),
       surveyId: survey.id || '', // 将在保存问卷时更新
       order: editingQuestionIndex !== null ? editingQuestionIndex + 1 : (survey.questions?.length || 0) + 1,
-      type: currentQuestion.type!,
-      content: currentQuestion.content,
+      type: questionType,
+      content: currentQuestion.content!,
       description: currentQuestion.description,
       required: currentQuestion.required || false,
       options: currentQuestion.options || [],
@@ -213,7 +216,7 @@ export default function CreateSurveyPage() {
       content: '',
       description: '',
       required: true,
-      options: template.defaultOptions.map(opt => ({
+      options: (template.defaultOptions || []).map(opt => ({
         ...opt,
         id: generateId(),
         questionId: generateId() // 为新问题生成questionId

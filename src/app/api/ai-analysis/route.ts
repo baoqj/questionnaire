@@ -37,16 +37,64 @@ async function getUserResponseAndSurvey(responseId: string, surveyId: string) {
       userId: 'user_' + responseId.slice(-6),
       answers: [
         // 模拟一个中等风险的用户画像
-        { questionId: 'q1', value: ['personal_bank', 'personal_securities'] },
-        { questionId: 'q2', value: 'offshore_company' }, // 使用离岸公司 - 触发高净值分析
-        { questionId: 'q3', value: ['crs_self_cert'] },
-        { questionId: 'q4', value: 'partial_understanding' },
-        { questionId: 'q5', value: 'sometimes_correct' },
-        { questionId: 'q6', value: 'frequent_transactions' },
-        { questionId: 'q7', value: 'partial_compliance' },
-        { questionId: 'q8', value: 'multiple_residency' }
+        {
+          id: 'a1',
+          responseId: 'test_response',
+          questionId: 'q1',
+          optionIds: ['personal_bank', 'personal_securities'],
+          question: { id: 'q1', surveyId: 'test', order: 1, type: 'multiple_choice', content: 'Test', required: true, options: [] }
+        },
+        {
+          id: 'a2',
+          responseId: 'test_response',
+          questionId: 'q2',
+          optionId: 'offshore_company',
+          question: { id: 'q2', surveyId: 'test', order: 2, type: 'single_choice', content: 'Test', required: true, options: [] }
+        },
+        {
+          id: 'a3',
+          responseId: 'test_response',
+          questionId: 'q3',
+          optionIds: ['crs_self_cert'],
+          question: { id: 'q3', surveyId: 'test', order: 3, type: 'multiple_choice', content: 'Test', required: true, options: [] }
+        },
+        {
+          id: 'a4',
+          responseId: 'test_response',
+          questionId: 'q4',
+          optionId: 'partial_understanding',
+          question: { id: 'q4', surveyId: 'test', order: 4, type: 'single_choice', content: 'Test', required: true, options: [] }
+        },
+        {
+          id: 'a5',
+          responseId: 'test_response',
+          questionId: 'q5',
+          optionId: 'sometimes_correct',
+          question: { id: 'q5', surveyId: 'test', order: 5, type: 'single_choice', content: 'Test', required: true, options: [] }
+        },
+        {
+          id: 'a6',
+          responseId: 'test_response',
+          questionId: 'q6',
+          optionId: 'frequent_transactions',
+          question: { id: 'q6', surveyId: 'test', order: 6, type: 'single_choice', content: 'Test', required: true, options: [] }
+        },
+        {
+          id: 'a7',
+          responseId: 'test_response',
+          questionId: 'q7',
+          optionId: 'partial_compliance',
+          question: { id: 'q7', surveyId: 'test', order: 7, type: 'single_choice', content: 'Test', required: true, options: [] }
+        },
+        {
+          id: 'a8',
+          responseId: 'test_response',
+          questionId: 'q8',
+          optionId: 'multiple_residency',
+          question: { id: 'q8', surveyId: 'test', order: 8, type: 'single_choice', content: 'Test', required: true, options: [] }
+        }
       ],
-      completedAt: new Date(),
+      completed: true,
       createdAt: new Date()
     };
 
@@ -118,7 +166,7 @@ export async function POST(request: NextRequest) {
 
     // 创建反馈对象
     const feedback: Feedback = {
-      id: `feedback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `feedback_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       responseId,
       aiSummary: aiResult.summary,
       riskAnalysis: aiResult.riskScores,
@@ -146,7 +194,7 @@ export async function POST(request: NextRequest) {
     // 返回fallback分析结果
     const fallbackFeedback: Feedback = {
       id: `feedback_${Date.now()}_fallback`,
-      responseId: request.body?.responseId || 'unknown',
+      responseId: 'unknown',
       aiSummary: '由于技术原因，无法生成详细的AI分析。以下是基于通用规则的风险评估。',
       riskAnalysis: {
         金融账户: 3,

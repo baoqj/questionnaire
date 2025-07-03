@@ -183,7 +183,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
             onClick={() => {
               setIsLogin(!isLogin);
               setError('');
-              setFormData({ name: '', phone: '', email: '' });
+              setFormData({ name: '', phone: '', email: '', password: '' });
             }}
             className="text-purple-600 hover:text-purple-700 text-sm transition-colors"
           >

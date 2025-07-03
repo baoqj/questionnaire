@@ -34,6 +34,9 @@ export interface Question {
     maxLength?: number;
     minSelections?: number;
     maxSelections?: number;
+    min?: number; // 用于量表题的最小值
+    max?: number; // 用于量表题的最大值
+    step?: number; // 用于量表题的步长
   };
 }
 
@@ -178,7 +181,7 @@ export interface LoginCredentials {
 // 问卷模板类型
 export interface QuestionTemplate {
   id: string;
-  type: string;
+  type: 'single_choice' | 'multiple_choice' | 'text' | 'scale' | 'rating' | 'matrix';
   name: string;
   description: string;
   icon: string;
@@ -186,6 +189,8 @@ export interface QuestionTemplate {
   validation: any;
   defaultOptions?: Option[];
 }
+
+
 
 // 管理员相关类型
 export interface AdminStats {

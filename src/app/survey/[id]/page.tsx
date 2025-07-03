@@ -174,7 +174,7 @@ export default function SurveyPage() {
       case 'rating':
         return {
           ...baseAnswer,
-          scaleValue
+          scaleValue: scaleValue || undefined
         };
       default:
         return baseAnswer as Answer;
@@ -281,9 +281,9 @@ export default function SurveyPage() {
       // 已登录用户
       userId = currentUser.id;
       userType = 'registered';
-    } else if (guestUser) {
+    } else if (guestUser && typeof guestUser === 'object' && 'id' in guestUser) {
       // 临时用户（填写了姓名和手机号）
-      userId = guestUser.id;
+      userId = (guestUser as any).id;
       userType = 'guest';
     } else {
       // 完全匿名用户

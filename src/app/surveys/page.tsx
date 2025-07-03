@@ -36,7 +36,8 @@ export default function SurveysPage() {
         setSurveys(data.surveys || []);
 
         // 获取分类
-        const categories = [...new Set(data.surveys.map((s: any) => s.category).filter(Boolean))];
+        const categorySet = new Set(data.surveys.map((s: any) => s.category).filter(Boolean));
+        const categories = Array.from(categorySet) as string[];
         setCategories(categories);
       }
     } catch (error) {

@@ -21,6 +21,16 @@ export class ApiService {
       simulateError(0.05);
 
       if (surveyId === 'crs-survey-001') {
+        // 返回一个简单的模拟问卷
+        const mockSurvey = {
+          id: 'crs-survey-001',
+          title: 'CRS合规风险评估',
+          description: '评估您的CRS合规风险等级',
+          category: '金融合规',
+          questions: [],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
         return {
           success: true,
           data: mockSurvey,

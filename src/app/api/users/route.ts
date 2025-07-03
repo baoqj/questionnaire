@@ -82,9 +82,10 @@ export async function POST(request: NextRequest) {
 
     // 创建匿名用户对象
     const user: User = {
-      id: `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `guest_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       name: name.trim(),
       phone: phone.trim(),
+      role: 'user',
       createdAt: new Date()
     };
 

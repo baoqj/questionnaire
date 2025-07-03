@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 更新最后登录时间
-    user.lastLoginAt = new Date().toISOString();
+    user.lastLoginAt = new Date();
     saveUsers(users);
 
     // 返回用户信息（不包含密码）
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
       user: {
         ...userWithoutPassword,
         createdAt: new Date(userWithoutPassword.createdAt),
-        lastLoginAt: new Date(user.lastLoginAt)
+        lastLoginAt: user.lastLoginAt || new Date()
       },
       message: '登录成功'
     });

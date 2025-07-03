@@ -174,7 +174,7 @@ function markdownToHTML(text: string): string {
     // 列表项 - item -> <li>item</li>
     .replace(/^- (.+)$/gm, '<li>$1</li>')
     // 包装连续的列表项
-    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+    .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
     // 数字列表 1. item -> <li>item</li>
     .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
     // 标题 ## title -> <h3>title</h3>

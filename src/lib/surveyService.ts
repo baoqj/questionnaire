@@ -87,11 +87,16 @@ export class SurveyService {
         score: this.calculateOptionScore(q.type, optIndex, q.options?.length || 1)
       })) || [];
 
+      // 确保type是有效的联合类型值
+      const validTypes: Array<'single_choice' | 'multiple_choice' | 'text' | 'scale' | 'rating' | 'matrix'> =
+        ['single_choice', 'multiple_choice', 'text', 'scale', 'rating', 'matrix'];
+      const questionType = validTypes.includes(q.type as any) ? q.type as any : 'single_choice';
+
       return {
         id: q.id,
         surveyId: surveyData.id,
         order: index + 1,
-        type: q.type || 'single_choice',
+        type: questionType,
         content: q.title,
         description: q.description,
         required: q.required !== false,
@@ -141,7 +146,8 @@ export class SurveyService {
   // 获取问卷分类
   static async getSurveyCategories(): Promise<string[]> {
     const surveys = await this.getAllSurveys();
-    const categories = [...new Set(surveys.map(s => s.category).filter(Boolean))];
+    const categorySet = new Set(surveys.map(s => s.category).filter(Boolean));
+    const categories = Array.from(categorySet) as string[];
     return categories;
   }
 
