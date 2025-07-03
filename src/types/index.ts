@@ -177,6 +177,7 @@ export interface LoginCredentials {
 
 // 问卷模板类型
 export interface QuestionTemplate {
+  id: string;
   type: string;
   name: string;
   description: string;
