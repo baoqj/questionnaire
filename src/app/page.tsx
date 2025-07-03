@@ -7,6 +7,8 @@ import { useAuth } from '@/lib/authService';
 // 移除直接导入 SurveyService，改用 API 调用
 import LoginModal from '@/components/auth/LoginModal';
 import { User } from '@/types';
+import bannerImage from '@/pic/banner.png';
+
 
 export default function HomePage() {
   const router = useRouter();
@@ -88,7 +90,7 @@ export default function HomePage() {
         <div className="w-[75vw] max-w-[400px] mb-2 mx-auto">
           <div className="relative w-full aspect-[4/3]">
             <Image
-              src="/pic/banner.png"
+              src={bannerImage}
               alt="CRS Check Banner"
               fill
               className="object-contain"
