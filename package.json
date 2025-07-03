@@ -7,16 +7,21 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "setup-env": "node scripts/setup-env.js",
+    "check-config": "node scripts/check-config.js",
+    "dev:check": "npm run check-config && npm run dev"
   },
   "dependencies": {
+    "@types/nodemailer": "^6.4.17",
+    "clsx": "^2.0.0",
     "next": "15.0.0",
+    "nodemailer": "^7.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.8.0",
-    "zustand": "^4.4.7",
-    "clsx": "^2.0.0",
-    "tailwind-merge": "^2.0.0"
+    "tailwind-merge": "^2.0.0",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
     "@types/node": "^20.8.0",

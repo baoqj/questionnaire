@@ -49,43 +49,79 @@ export default function ResultPage() {
   const [email, setEmail] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [sendSuccess, setSendSuccess] = useState(false);
+  const [analysisTime, setAnalysisTime] = useState<number | null>(null);
 
   useEffect(() => {
     const loadResults = async () => {
       setIsLoading(true);
-      
-      if (responseId) {
+
+      if (responseId && surveyId) {
         const savedResponse = storage.get<Response>(`response_${responseId}`);
         if (savedResponse) {
           setResponse(savedResponse);
-          
-          // 模拟AI分析生成
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          const mockFeedback: Feedback = {
-            id: 'feedback-001',
-            responseId: responseId,
-            aiSummary: '基于您的回答，我们为您生成了个性化的CRS合规风险分析报告。',
-            riskAnalysis: {
-              金融账户: 2,
-              控制人: 4,
-              结构: 4,
-              合规: 3,
-              税务: 5
-            },
-            suggestions: mockSuggestions.map(s => s.content),
-            createdAt: new Date()
-          };
-          
-          setFeedback(mockFeedback);
+
+          try {
+            // 调用AI分析API
+            console.log('🚀 开始AI分析...');
+            const startTime = Date.now();
+
+            const analysisResponse = await fetch('/api/ai-analysis', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                responseId: responseId,
+                surveyId: surveyId
+              }),
+            });
+
+            const analysisResult = await analysisResponse.json();
+            const endTime = Date.now();
+            const totalTime = endTime - startTime;
+
+            setAnalysisTime(totalTime);
+            console.log(`⚡ AI分析完成，总耗时: ${totalTime}ms`);
+
+            if (analysisResult.success && analysisResult.data) {
+              console.log('AI analysis completed:', analysisResult.data);
+              setFeedback(analysisResult.data);
+            } else {
+              console.error('AI analysis failed:', analysisResult.error);
+              // 使用fallback分析
+              setFeedback(createFallbackFeedback(responseId));
+            }
+          } catch (error) {
+            console.error('Error calling AI analysis:', error);
+            // 使用fallback分析
+            setFeedback(createFallbackFeedback(responseId));
+          }
+        } else {
+          console.error('No saved response found for ID:', responseId);
         }
       }
-      
+
       setIsLoading(false);
     };
 
+    // 创建fallback反馈
+    const createFallbackFeedback = (responseId: string): Feedback => ({
+      id: 'feedback-fallback',
+      responseId: responseId,
+      aiSummary: '基于您的回答，我们为您生成了CRS合规风险分析报告。',
+      riskAnalysis: {
+        金融账户: 2,
+        控制人: 4,
+        结构: 4,
+        合规: 3,
+        税务: 5
+      },
+      suggestions: mockSuggestions.map(s => s.content),
+      createdAt: new Date()
+    });
+
     loadResults();
-  }, [responseId]);
+  }, [responseId, surveyId]);
 
   const radarData = feedback ? riskDimensions.map(dim => ({
     dimension: dim.label,
@@ -114,15 +150,18 @@ export default function ResultPage() {
     setIsSending(true);
 
     try {
-      // 准备报告数据
+      // 准备AI报告数据
       const reportData = {
         surveyId,
         userId,
         responseId,
         radarData,
-        suggestions: mockSuggestions,
+        aiSummary: feedback?.aiSummary,
+        suggestions: feedback?.suggestions || [],
         riskAnalysis: feedback?.riskAnalysis,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        aiGenerated: true,
+        promptUsed: feedback?.metadata?.promptUsed || 'unknown'
       };
 
       // 调用API发送邮件
@@ -163,10 +202,17 @@ export default function ResultPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white">正在生成您的专属分析报告...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mx-auto mb-6"></div>
+          <h2 className="text-2xl font-semibold text-white mb-4">AI智能分析中...</h2>
+          <p className="text-white/80 mb-2">正在运用先进的AI技术分析您的回答</p>
+          <p className="text-white/60 text-sm">预计需要10-30秒，请稍候</p>
+          <div className="mt-6 flex justify-center space-x-2">
+            <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+            <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+          </div>
         </div>
       </div>
     );
@@ -202,7 +248,7 @@ export default function ResultPage() {
         </button>
 
         <h1 className="text-lg font-semibold text-white">
-          你的风险分析及建议
+          AI智能风险分析报告
         </h1>
 
         <div className="w-6"></div>
@@ -242,33 +288,41 @@ export default function ResultPage() {
       {/* 分析建议内容 */}
       <div className="px-4 pb-32">
         <div className="bg-white rounded-t-3xl p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-            详细分析报告
-          </h2>
+          <div className="flex items-center mb-6 justify-center">
+            <h2 className="text-2xl font-bold text-gray-800">
+              AI智能分析报告
+            </h2>
+            <div className="ml-3 px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-medium rounded-full">
+              AI生成
+            </div>
+          </div>
 
-          {/* 显示所有建议 */}
-          <div className="space-y-8">
-            {mockSuggestions.map((suggestion, index) => (
-              <div key={index} className="border-b border-gray-200 pb-8 last:border-b-0">
-                <div className="flex items-center mb-4">
-                  <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+          {/* AI摘要 */}
+          <div className="mb-8">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-purple-400 p-6 rounded-r-lg">
+              <p className="text-gray-700 leading-relaxed font-medium">
+                {feedback.aiSummary}
+              </p>
+            </div>
+          </div>
+
+          {/* 显示AI生成的建议 */}
+          <div className="space-y-6">
+            {feedback.suggestions.map((suggestion, index) => (
+              <div key={index} className="border-b border-gray-200 pb-6 last:border-b-0">
+                <div className="flex items-start mb-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-4 mt-1">
                     {index + 1}
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-800">
-                    {suggestion.title}
-                  </h3>
-                  <div className={`ml-auto px-3 py-1 rounded-full text-xs font-medium ${
-                    suggestion.level === 'high' ? 'bg-red-100 text-red-800' :
-                    suggestion.level === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-green-100 text-green-800'
-                  }`}>
-                    {suggestion.level === 'high' ? '高风险' :
-                     suggestion.level === 'medium' ? '中风险' : '低风险'}
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                      专业建议 {index + 1}
+                    </h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      {suggestion}
+                    </p>
                   </div>
                 </div>
-                <p className="text-gray-700 leading-relaxed text-base">
-                  {suggestion.content}
-                </p>
               </div>
             ))}
           </div>
@@ -355,10 +409,15 @@ export default function ResultPage() {
       )}
 
       {/* 底部标识 */}
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2">
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 text-center">
         <p className="text-white/60 text-sm">
-          Powered by Knowcore AI
+          Powered by AIBao 2025
         </p>
+        {analysisTime && (
+          <p className="text-white/40 text-xs mt-1">
+            ⚡ AI分析耗时: {(analysisTime / 1000).toFixed(1)}秒
+          </p>
+        )}
       </div>
     </div>
   );

@@ -170,7 +170,7 @@ export default function GuestInfoPage() {
       {/* 底部标识 */}
       <div className="p-4 text-center">
         <p className="text-white/60 text-sm">
-          Powered by Knowcore AI
+          Powered by AIBao 2025
         </p>
       </div>
     </div>

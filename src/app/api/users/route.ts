@@ -1,6 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { User } from '@/types';
+import fs from 'fs';
+import path from 'path';
 
+// 用户数据文件路径
+const USERS_FILE = path.join(process.cwd(), 'src', 'data', 'users.json');
+
+// 读取用户数据
+function getUsers(): User[] {
+  try {
+    if (!fs.existsSync(USERS_FILE)) {
+      return [];
+    }
+    const data = fs.readFileSync(USERS_FILE, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading users file:', error);
+    return [];
+  }
+}
+
+// 获取所有用户（管理员功能）
+export async function GET(request: NextRequest) {
+  try {
+    const users = getUsers();
+
+    // 移除密码字段
+    const usersWithoutPasswords = users.map(user => {
+      const { password, ...userWithoutPassword } = user;
+      return {
+        ...userWithoutPassword,
+        createdAt: new Date(userWithoutPassword.createdAt),
+        lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined
+      };
+    });
+
+    return NextResponse.json({
+      success: true,
+      users: usersWithoutPasswords
+    });
+
+  } catch (error) {
+    console.error('Error getting users:', error);
+    return NextResponse.json({
+      success: false,
+      error: 'Internal server error'
+    }, { status: 500 });
+  }
+}
+
+// 创建匿名用户（用于问卷填写）
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -31,28 +80,22 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // 模拟数据库保存延迟
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // 创建用户对象
+    // 创建匿名用户对象
     const user: User = {
-      id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       name: name.trim(),
       phone: phone.trim(),
       createdAt: new Date()
     };
 
-    // 在实际应用中，这里应该保存到数据库
-    // await saveUserToDatabase(user);
-
     return NextResponse.json({
       success: true,
       data: user,
-      message: 'User created successfully'
+      message: 'Guest user created successfully'
     });
 
   } catch (error) {
-    console.error('Error creating user:', error);
+    console.error('Error creating guest user:', error);
     return NextResponse.json({
       success: false,
       error: 'Internal server error'

@@ -1,28 +1,6 @@
 import { User, LoginCredentials, AuthState } from '@/types';
 
-// 模拟用户数据库
-const MOCK_USERS: User[] = [
-  {
-    id: 'admin_001',
-    name: '管理员',
-    phone: '13800000000',
-    email: 'admin@example.com',
-    password: '13800000000',
-    role: 'admin',
-    createdAt: new Date('2024-01-01'),
-    lastLoginAt: new Date()
-  },
-  {
-    id: 'user_001',
-    name: '测试用户',
-    phone: '13800000001',
-    email: 'user@example.com',
-    password: '13800000001',
-    role: 'user',
-    createdAt: new Date('2024-01-01'),
-    lastLoginAt: new Date()
-  }
-];
+// 认证服务 - 使用API进行用户管理
 
 // 认证服务类
 export class AuthService {
@@ -32,85 +10,62 @@ export class AuthService {
   // 登录
   static async login(credentials: LoginCredentials): Promise<{ success: boolean; user?: User; error?: string }> {
     try {
-      // 模拟API延迟
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // 调用登录API
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
 
-      // 验证必填字段
-      if (!credentials.phone || !credentials.password) {
-        return { success: false, error: '请输入手机号和密码' };
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.error || '登录失败' };
       }
 
-      // 查找用户
-      const user = MOCK_USERS.find(u => u.phone === credentials.phone);
-
-      if (!user) {
-        return { success: false, error: '用户不存在' };
+      if (data.success && data.user) {
+        // 保存到本地存储
+        this.saveUserToStorage(data.user);
+        return { success: true, user: data.user };
+      } else {
+        return { success: false, error: data.error || '登录失败' };
       }
-
-      // 验证密码（在实际应用中应该使用加密比较）
-      if (user.password !== credentials.password) {
-        return { success: false, error: '密码错误' };
-      }
-
-      // 更新最后登录时间
-      user.lastLoginAt = new Date();
-
-      // 保存到本地存储
-      this.saveUserToStorage(user);
-
-      return { success: true, user };
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, error: '登录失败，请稍后重试' };
+      return { success: false, error: '网络错误，请稍后重试' };
     }
   }
 
   // 注册
   static async register(userData: { name: string; phone: string; email?: string; password: string }): Promise<{ success: boolean; user?: User; error?: string }> {
     try {
-      // 模拟API延迟
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // 调用注册API
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
 
-      // 检查用户是否已存在
-      const existingUser = MOCK_USERS.find(u => u.phone === userData.phone);
-      if (existingUser) {
-        return { success: false, error: '用户已存在' };
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.error || '注册失败' };
       }
 
-      // 验证必填字段
-      if (!userData.name || !userData.phone || !userData.password) {
-        return { success: false, error: '请填写所有必填字段' };
+      if (data.success && data.user) {
+        // 保存到本地存储
+        this.saveUserToStorage(data.user);
+        return { success: true, user: data.user };
+      } else {
+        return { success: false, error: data.error || '注册失败' };
       }
-
-      // 验证手机号格式
-      if (!this.validatePhone(userData.phone)) {
-        return { success: false, error: '请输入正确的手机号' };
-      }
-
-      // 验证用户名长度
-      if (!this.validateName(userData.name)) {
-        return { success: false, error: '姓名长度应在2-20个字符之间' };
-      }
-
-      // 创建新用户
-      const newUser: User = {
-        id: `user_${Date.now()}`,
-        name: userData.name,
-        phone: userData.phone,
-        email: userData.email || '',
-        password: userData.password, // 在实际应用中应该加密存储
-        role: 'user',
-        createdAt: new Date(),
-        lastLoginAt: new Date()
-      };
-
-      MOCK_USERS.push(newUser);
-      this.saveUserToStorage(newUser);
-
-      return { success: true, user: newUser };
     } catch (error) {
       console.error('Registration error:', error);
-      return { success: false, error: '注册失败，请稍后重试' };
+      return { success: false, error: '网络错误，请稍后重试' };
     }
   }
 
@@ -165,34 +120,63 @@ export class AuthService {
   // 更新用户信息
   static async updateUser(userId: string, updates: Partial<User>): Promise<{ success: boolean; user?: User; error?: string }> {
     try {
-      const userIndex = MOCK_USERS.findIndex(u => u.id === userId);
-      if (userIndex === -1) {
-        return { success: false, error: '用户不存在' };
+      // 调用更新用户API
+      const response = await fetch(`/api/auth/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.error || '更新失败' };
       }
 
-      // 更新用户信息
-      MOCK_USERS[userIndex] = { ...MOCK_USERS[userIndex], ...updates };
-      const updatedUser = MOCK_USERS[userIndex];
-
-      // 如果是当前用户，更新本地存储
-      const currentUser = this.getCurrentUser();
-      if (currentUser && currentUser.id === userId) {
-        this.saveUserToStorage(updatedUser);
+      if (data.success && data.user) {
+        // 如果是当前用户，更新本地存储
+        const currentUser = this.getCurrentUser();
+        if (currentUser && currentUser.id === userId) {
+          this.saveUserToStorage(data.user);
+        }
+        return { success: true, user: data.user };
+      } else {
+        return { success: false, error: data.error || '更新失败' };
       }
-
-      return { success: true, user: updatedUser };
     } catch (error) {
-      return { success: false, error: '更新失败' };
+      console.error('Update user error:', error);
+      return { success: false, error: '网络错误，请稍后重试' };
     }
   }
 
   // 获取所有用户（管理员功能）
   static async getAllUsers(): Promise<User[]> {
-    // 只有管理员可以访问
-    if (!this.isAdmin()) {
-      throw new Error('权限不足');
+    try {
+      // 只有管理员可以访问
+      if (!this.isAdmin()) {
+        throw new Error('权限不足');
+      }
+
+      const response = await fetch('/api/auth/users', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || '获取用户列表失败');
+      }
+
+      return data.users || [];
+    } catch (error) {
+      console.error('Get all users error:', error);
+      throw error;
     }
-    return MOCK_USERS;
   }
 
   // 保存用户到本地存储
@@ -219,17 +203,17 @@ export const useAuth = () => {
   const getCurrentUser = () => AuthService.getCurrentUser();
   const isAuthenticated = () => AuthService.isAuthenticated();
   const isAdmin = () => AuthService.isAdmin();
-  
+
   return {
-    login: AuthService.login,
-    register: AuthService.register,
-    logout: AuthService.logout,
+    login: (credentials: LoginCredentials) => AuthService.login(credentials),
+    register: (userData: { name: string; phone: string; email?: string; password: string }) => AuthService.register(userData),
+    logout: () => AuthService.logout(),
     getCurrentUser,
     isAuthenticated,
     isAdmin,
-    updateUser: AuthService.updateUser,
-    getAllUsers: AuthService.getAllUsers,
-    validatePhone: AuthService.validatePhone,
-    validateName: AuthService.validateName
+    updateUser: (userId: string, userData: Partial<User>) => AuthService.updateUser(userId, userData),
+    getAllUsers: () => AuthService.getAllUsers(),
+    validatePhone: (phone: string) => AuthService.validatePhone(phone),
+    validateName: (name: string) => AuthService.validateName(name)
   };
 };

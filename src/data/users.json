@@ -1,0 +1,42 @@
+[
+  {
+    "id": "admin_001",
+    "name": "管理员",
+    "phone": "13800000000",
+    "email": "admin@example.com",
+    "password": "13800000000",
+    "role": "admin",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "lastLoginAt": "2025-07-03T05:06:00.296Z"
+  },
+  {
+    "id": "user_001",
+    "name": "测试用户",
+    "phone": "13800000001",
+    "email": "user@example.com",
+    "password": "13800000001",
+    "role": "user",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "lastLoginAt": "2025-07-03T05:06:30.454Z"
+  },
+  {
+    "id": "user_1751518413425_p38l7fm4i",
+    "name": "测试用户2",
+    "phone": "13800000002",
+    "email": "",
+    "password": "123456",
+    "role": "user",
+    "createdAt": "2025-07-03T04:53:33.425Z",
+    "lastLoginAt": "2025-07-03T04:53:33.425Z"
+  },
+  {
+    "id": "user_1751518564580_ozfqp86xg",
+    "name": "测试用户3",
+    "phone": "13800000003",
+    "email": "",
+    "password": "123456",
+    "role": "user",
+    "createdAt": "2025-07-03T04:56:04.580Z",
+    "lastLoginAt": "2025-07-03T04:56:04.580Z"
+  }
+]

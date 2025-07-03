@@ -534,7 +534,7 @@ export default function SurveyPage() {
       {/* 底部标识 */}
       <div className="text-center pb-4">
         <p className="text-white/60 text-sm">
-          Powered by AIBao
+          Powered by AIBao 2025
         </p>
       </div>
     </div>

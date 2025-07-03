@@ -99,6 +99,12 @@ export interface Feedback {
   riskAnalysis: RiskAnalysis;
   suggestions: string[];
   createdAt: Date;
+  metadata?: {
+    promptUsed?: string;
+    aiGenerated?: boolean;
+    version?: string;
+    error?: string;
+  };
 }
 
 // 应用状态类型
