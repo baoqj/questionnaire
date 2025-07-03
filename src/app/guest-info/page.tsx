@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { storage } from '@/lib/utils';
 
-export default function GuestInfoPage() {
+function GuestInfoContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const surveyId = searchParams.get('surveyId') || 'bank_crs_01';
@@ -174,5 +174,13 @@ export default function GuestInfoPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function GuestInfoPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <GuestInfoContent />
+    </Suspense>
   );
 }

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 // 移除直接导入 SurveyService，改用 API 调用
 import { Survey, Answer, Response, User } from '@/types';
 import { generateId, storage } from '@/lib/utils';
 
-export default function SurveyPage() {
+function SurveyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const surveyId = searchParams.get('surveyId');
@@ -303,5 +303,13 @@ export default function SurveyPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function SurveyPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SurveyContent />
+    </Suspense>
   );
 }
