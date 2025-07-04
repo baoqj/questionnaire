@@ -125,11 +125,38 @@ export class ConfigValidator {
    */
   static validateRequired(): { isValid: boolean; missingVars: string[] } {
     const requiredVars = [
-      'LLM_API_KEY'
+      'LLM_PRIMARY_API_KEY'
     ];
-    
+
     const missingVars = requiredVars.filter(varName => !process.env[varName]);
-    
+
+    return {
+      isValid: missingVars.length === 0,
+      missingVars
+    };
+  }
+
+  /**
+   * 验证LLM配置是否完整
+   */
+  static validateLLMConfig(): { isValid: boolean; missingVars: string[] } {
+    const requiredVars = [
+      'LLM_PRIMARY_ENDPOINT',
+      'LLM_PRIMARY_API_KEY',
+      'LLM_PRIMARY_MODEL'
+    ];
+
+    // 如果启用了备用服务，也检查备用服务配置
+    if (LLM_CONFIG.enableFallback) {
+      requiredVars.push(
+        'LLM_BACKUP_ENDPOINT',
+        'LLM_BACKUP_API_KEY',
+        'LLM_BACKUP_MODEL'
+      );
+    }
+
+    const missingVars = requiredVars.filter(varName => !process.env[varName]);
+
     return {
       isValid: missingVars.length === 0,
       missingVars
@@ -168,22 +195,29 @@ export class ConfigValidator {
    */
   static printConfigStatus(): void {
     if (!APP_CONFIG.isDevelopment) return;
-    
+
     console.log('🔧 配置状态检查:');
-    
+
     const requiredValidation = this.validateRequired();
     console.log(`✅ 必需配置: ${requiredValidation.isValid ? '完整' : '缺失'}`);
     if (!requiredValidation.isValid) {
       console.log(`❌ 缺失变量: ${requiredValidation.missingVars.join(', ')}`);
     }
-    
+
+    const llmValidation = this.validateLLMConfig();
+    console.log(`🤖 LLM配置: ${llmValidation.isValid ? '完整' : '缺失'}`);
+    if (!llmValidation.isValid) {
+      console.log(`❌ 缺失变量: ${llmValidation.missingVars.join(', ')}`);
+    }
+
     const emailValidation = this.validateEmailConfig();
     console.log(`📧 邮件配置: ${emailValidation.isValid ? '完整' : '缺失'}`);
     if (!emailValidation.isValid) {
       console.log(`❌ 缺失变量: ${emailValidation.missingVars.join(', ')}`);
     }
-    
-    console.log(`🤖 LLM主要服务: ${LLM_CONFIG.primary.endpoint}`);
+
+    console.log(`🤖 LLM主要服务: ${LLM_CONFIG.primary.endpoint} (${LLM_CONFIG.primary.model})`);
+    console.log(`🔄 LLM备用服务: ${LLM_CONFIG.enableFallback ? LLM_CONFIG.backup.endpoint : '未启用'}`);
     console.log(`📧 邮件服务: ${EMAIL_CONFIG.service}`);
     console.log(`🔧 运行环境: ${APP_CONFIG.env}`);
   }

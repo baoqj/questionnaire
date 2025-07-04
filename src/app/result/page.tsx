@@ -7,13 +7,13 @@ import { Response, RiskAnalysis, Feedback } from '@/types';
 import { storage } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-// 风险分析维度
+// 风险分析维度 - 更新为新的五个维度
 const riskDimensions = [
-  { key: '金融账户', label: '金融账户', color: '#7C3AED' },
-  { key: '控制人', label: '控制人', color: '#A855F7' },
-  { key: '结构', label: '结构', color: '#C084FC' },
-  { key: '合规', label: '合规', color: '#D8B4FE' },
-  { key: '税务', label: '税务', color: '#E9D5FF' }
+  { key: '金融账户穿透风险', label: '金融账户穿透', color: '#7C3AED' },
+  { key: '实体分类与结构风险', label: '实体分类结构', color: '#A855F7' },
+  { key: '税务居民身份协调', label: '税务居民身份', color: '#C084FC' },
+  { key: '控权人UBO暴露风险', label: '控权人UBO', color: '#D8B4FE' },
+  { key: '合规准备与后续行为', label: '合规准备行为', color: '#E9D5FF' }
 ];
 
 // 模拟分析建议
@@ -125,8 +125,8 @@ function ResultContent() {
 
   const radarData = feedback ? riskDimensions.map(dim => ({
     dimension: dim.label,
-    value: feedback.riskAnalysis[dim.key as keyof RiskAnalysis],
-    fullMark: 5
+    value: feedback.metadata?.radarScores?.[dim.key] || feedback.riskAnalysis?.[dim.key as keyof RiskAnalysis] || 3,
+    fullMark: 9
   })) : [];
 
   // 邮件发送功能
@@ -200,6 +200,32 @@ function ResultContent() {
     router.push('/');
   };
 
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/?surveyId=${surveyId}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'CRS合规风险评估',
+          text: '快来测试你的CRS合规风险等级！',
+          url: shareUrl,
+        });
+      } catch (error) {
+        console.log('分享取消或失败:', error);
+      }
+    } else {
+      // 复制到剪贴板
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        alert('链接已复制到剪贴板！');
+      } catch (error) {
+        console.error('复制失败:', error);
+        // 降级方案：显示链接
+        prompt('请复制以下链接:', shareUrl);
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 flex items-center justify-center">
@@ -254,36 +280,7 @@ function ResultContent() {
         <div className="w-6"></div>
       </div>
 
-      {/* 雷达图区域 */}
-      <div className="px-4 mb-6">
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-          <h2 className="text-white text-lg font-semibold mb-4 text-center">风险评估雷达图</h2>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={radarData}>
-                <PolarGrid stroke="#ffffff40" />
-                <PolarAngleAxis
-                  dataKey="dimension"
-                  tick={{ fill: '#ffffff', fontSize: 12 }}
-                />
-                <PolarRadiusAxis
-                  angle={90}
-                  domain={[0, 5]}
-                  tick={{ fill: '#ffffff80', fontSize: 10 }}
-                />
-                <Radar
-                  name="风险评分"
-                  dataKey="value"
-                  stroke="#7C3AED"
-                  fill="#7C3AED"
-                  fillOpacity={0.3}
-                  strokeWidth={2}
-                />
-              </RadarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
+
 
       {/* 分析建议内容 */}
       <div className="px-4 pb-32">
@@ -297,44 +294,217 @@ function ResultContent() {
             </div>
           </div>
 
-          {/* AI摘要 */}
+          {/* 第一部分：整体风险等级 */}
           <div className="mb-8">
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-purple-400 p-6 rounded-r-lg">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <span className="w-8 h-8 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">1</span>
+              整体风险等级
+            </h3>
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-red-400 p-6 rounded-r-lg">
+              <div className="flex items-center mb-3">
+                <span className="text-3xl font-bold text-red-600 mr-4">
+                  {feedback.metadata?.overallRiskLevel || 35}
+                </span>
+                <span className="text-gray-600">/ 99</span>
+              </div>
               <p className="text-gray-700 leading-relaxed font-medium">
-                {feedback.aiSummary}
+                {feedback.metadata?.riskLevelComment || feedback.aiSummary}
               </p>
             </div>
           </div>
 
-          {/* 显示AI生成的建议 */}
-          <div className="space-y-6">
-            {feedback.suggestions.map((suggestion, index) => (
-              <div key={index} className="border-b border-gray-200 pb-6 last:border-b-0">
-                <div className="flex items-start mb-3">
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-4 mt-1">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                      专业建议 {index + 1}
-                    </h3>
-                    <p className="text-gray-700 leading-relaxed">
-                      {suggestion}
-                    </p>
-                  </div>
-                </div>
+          {/* 第二部分：风险评分雷达图 */}
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">2</span>
+              风险评分
+            </h3>
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-200">
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart data={radarData}>
+                    <PolarGrid stroke="#6366f1" strokeOpacity={0.3} />
+                    <PolarAngleAxis
+                      dataKey="dimension"
+                      tick={{ fill: '#374151', fontSize: 12, fontWeight: 'bold' }}
+                    />
+                    <PolarRadiusAxis
+                      angle={90}
+                      domain={[0, 9]}
+                      tick={{ fill: '#6b7280', fontSize: 10 }}
+                    />
+                    <Radar
+                      name="风险评分"
+                      dataKey="value"
+                      stroke="#7C3AED"
+                      fill="#7C3AED"
+                      fillOpacity={0.2}
+                      strokeWidth={3}
+                    />
+                  </RadarChart>
+                </ResponsiveContainer>
               </div>
-            ))}
+            </div>
           </div>
 
+          {/* 第三部分：详细风险解读 */}
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <span className="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">3</span>
+              详细风险解读
+            </h3>
+
+            {/* 显示新的详细解读 */}
+            {feedback.metadata?.detailedAnalysis?.riskDetailedAnalysis && (
+              <div className="space-y-4 mb-6">
+                {Object.entries(feedback.metadata.detailedAnalysis.riskDetailedAnalysis).map(([key, value], index) => (
+                  <div key={key} className="bg-gradient-to-r from-green-50 to-teal-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                    <h4 className="font-semibold text-gray-800 mb-2">{key}</h4>
+                    <p className="text-gray-700 leading-relaxed text-sm">{value}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 传统的风险因素、合规缺口、建议 */}
+            {feedback.metadata?.detailedAnalysis && (
+              <div className="space-y-6">
+                {feedback.metadata.detailedAnalysis.riskFactors?.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-3">风险因素</h4>
+                    <ul className="space-y-2">
+                      {feedback.metadata.detailedAnalysis.riskFactors.map((factor, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="w-2 h-2 bg-red-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                          <span className="text-gray-700 text-sm">{factor}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {feedback.metadata.detailedAnalysis.complianceGaps?.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-3">合规缺口</h4>
+                    <ul className="space-y-2">
+                      {feedback.metadata.detailedAnalysis.complianceGaps.map((gap, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="w-2 h-2 bg-yellow-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                          <span className="text-gray-700 text-sm">{gap}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {feedback.metadata.detailedAnalysis.recommendations?.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-3">专业建议</h4>
+                    <ul className="space-y-2">
+                      {feedback.metadata.detailedAnalysis.recommendations.map((rec, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                          <span className="text-gray-700 text-sm">{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* 第四部分：评估总结 */}
+          {feedback.metadata?.summaryAndSuggestions && (
+            <div className="mb-8">
+              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <span className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">4</span>
+                评估总结
+              </h3>
+
+              {/* 评估总结 */}
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-l-4 border-purple-400 p-6 rounded-r-lg mb-4">
+                <p className="text-purple-700 leading-relaxed text-sm">
+                  {feedback.metadata.summaryAndSuggestions.evaluationSummary}
+                </p>
+              </div>
+
+              {/* 专业建议 */}
+              {feedback.metadata.summaryAndSuggestions.professionalAdvice && (
+                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-400 p-6 rounded-r-lg">
+                  <h4 className="font-semibold text-indigo-800 mb-4">专业建议</h4>
+                  <div className="text-indigo-700 text-sm leading-relaxed whitespace-pre-line">
+                    {feedback.metadata.summaryAndSuggestions.professionalAdvice}
+                  </div>
+                </div>
+              )}
+
+              {/* 兼容性：显示传统优化建议（如果新结构不存在） */}
+              {!feedback.metadata.summaryAndSuggestions.professionalAdvice && feedback.metadata.summaryAndSuggestions.optimizationSuggestions?.length > 0 && (
+                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-400 p-6 rounded-r-lg">
+                  <h4 className="font-semibold text-indigo-800 mb-3">专业建议</h4>
+                  <ul className="space-y-2">
+                    {feedback.metadata.summaryAndSuggestions.optimizationSuggestions.map((suggestion, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className="w-2 h-2 bg-indigo-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span className="text-indigo-700 text-sm">{suggestion}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+
+
+          {/* 兼容性：显示传统建议（如果新结构不存在） */}
+          {!feedback.metadata?.summaryAndSuggestions && feedback.suggestions && (
+            <div className="mb-8">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">专业建议</h3>
+              <div className="space-y-6">
+                {feedback.suggestions.map((suggestion, index) => (
+                  <div key={index} className="border-b border-gray-200 pb-6 last:border-b-0">
+                    <div className="flex items-start mb-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-4 mt-1">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                          专业建议 {index + 1}
+                        </h4>
+                        <p className="text-gray-700 leading-relaxed">
+                          {suggestion}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* 底部按钮 */}
-          <div className="flex flex-col space-y-4 mt-8 pt-8 border-t border-gray-200">
-            <button
-              onClick={handleSendReport}
-              className="w-full bg-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-purple-700 transition-colors"
-            >
-              发送报告
-            </button>
+          <div className="mt-8 pt-8 border-t border-gray-200 space-y-4">
+            {/* 发送报告和分享按钮在同一行 */}
+            <div className="flex space-x-3">
+              <button
+                onClick={handleSendReport}
+                className="flex-1 bg-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-purple-700 transition-colors"
+              >
+                发送报告
+              </button>
+              <button
+                onClick={handleShare}
+                className="w-16 h-16 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center"
+                title="分享问卷"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                </svg>
+              </button>
+            </div>
+            {/* 返回首页按钮 */}
             <button
               onClick={handleBackToHome}
               className="w-full bg-gray-100 text-gray-700 py-4 rounded-xl font-semibold text-lg hover:bg-gray-200 transition-colors"

@@ -100,9 +100,14 @@ export async function testAIAnalysis() {
     
     console.log('AI分析结果:');
     console.log('- 使用的prompt:', analysisResult.promptUsed);
-    console.log('- 风险评分:', analysisResult.riskScores);
-    console.log('- 建议数量:', analysisResult.suggestions.length);
-    console.log('- 摘要:', analysisResult.summary.substring(0, 100) + '...');
+    console.log('- 整体风险等级:', analysisResult.overallRiskLevel);
+    console.log('- 风险等级评论:', analysisResult.riskLevelComment);
+    console.log('- 雷达图评分:', analysisResult.radarScores);
+    console.log('- 详细分析:', analysisResult.detailedAnalysis);
+    console.log('- 行动计划:', analysisResult.actionPlan);
+    console.log('- 兼容性风险评分:', analysisResult.riskScores);
+    console.log('- 兼容性建议数量:', analysisResult.suggestions?.length || 0);
+    console.log('- 兼容性摘要:', analysisResult.summary?.substring(0, 100) + '...' || '无摘要');
     
     return analysisResult;
   } catch (error) {

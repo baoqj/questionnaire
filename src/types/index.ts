@@ -94,7 +94,7 @@ export interface RiskAnalysis {
   税务: number;
 }
 
-// AI 反馈类型
+// AI 反馈类型 - 支持新的四部分结构
 export interface Feedback {
   id: string;
   responseId: string;
@@ -107,6 +107,38 @@ export interface Feedback {
     aiGenerated?: boolean;
     version?: string;
     error?: string;
+    // 新增四部分结构的元数据
+    overallRiskLevel?: number;
+    riskLevelComment?: string;
+    radarScores?: {
+      金融账户穿透风险: number;
+      实体分类与结构风险: number;
+      税务居民身份协调: number;
+      控权人UBO暴露风险: number;
+      合规准备与后续行为: number;
+    };
+    detailedAnalysis?: {
+      riskFactors?: string[];
+      complianceGaps?: string[];
+      recommendations?: string[];
+      riskDetailedAnalysis?: {
+        金融账户穿透风险: string;
+        实体分类与结构风险: string;
+        税务居民身份协调: string;
+        控权人UBO暴露风险: string;
+        合规准备与后续行为: string;
+      };
+    };
+    actionPlan?: {
+      immediate: string[];
+      shortTerm: string[];
+      longTerm: string[];
+    };
+    summaryAndSuggestions?: {
+      evaluationSummary: string;
+      optimizationSuggestions?: string[];
+      professionalAdvice?: string;
+    };
   };
 }
 
