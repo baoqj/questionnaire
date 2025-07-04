@@ -125,7 +125,7 @@ function ResultContent() {
 
   const radarData = feedback ? riskDimensions.map(dim => ({
     dimension: dim.label,
-    value: feedback.metadata?.radarScores?.[dim.key] || feedback.riskAnalysis?.[dim.key as keyof RiskAnalysis] || 3,
+    value: feedback.metadata?.radarScores?.[dim.key as keyof typeof feedback.metadata.radarScores] || feedback.riskAnalysis?.[dim.key as keyof RiskAnalysis] || 3,
     fullMark: 9
   })) : [];
 
