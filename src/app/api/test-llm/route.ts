@@ -9,7 +9,20 @@ import { LLMTester } from '@/lib/llm-test';
 export async function GET(request: NextRequest) {
   try {
     console.log('🧪 开始LLM API测试...');
-    
+
+    // 检查环境变量
+    const envCheck = {
+      LLM_ENABLE_MOCK: process.env.LLM_ENABLE_MOCK,
+      LLM_FORCE_REAL_API: process.env.LLM_FORCE_REAL_API,
+      NODE_ENV: process.env.NODE_ENV,
+      LLM_PRIMARY_API_KEY: process.env.LLM_PRIMARY_API_KEY ? '已设置' : '未设置',
+      LLM_BACKUP_API_KEY: process.env.LLM_BACKUP_API_KEY ? '已设置' : '未设置',
+      mockModeActive: process.env.LLM_ENABLE_MOCK === 'true' ||
+                     (process.env.NODE_ENV === 'production' && !process.env.LLM_FORCE_REAL_API)
+    };
+
+    console.log('🔍 环境变量检查:', envCheck);
+
     // 执行全面测试
     const results = await LLMTester.testAllProviders({
       verbose: true,
@@ -18,12 +31,13 @@ export async function GET(request: NextRequest) {
 
     // 生成详细报告
     const report = LLMTester.generateReport(results);
-    
+
     console.log('📋 测试报告:');
     console.log(report);
 
     return NextResponse.json({
       success: results.summary.successCount > 0,
+      environmentCheck: envCheck,
       results,
       report,
       timestamp: new Date().toISOString()
