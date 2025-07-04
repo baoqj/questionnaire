@@ -28,14 +28,27 @@ export const EMAIL_CONFIG = {
 } as const;
 
 // ===========================================
-// 🤖 LLM API配置
+// 🤖 LLM API配置 - 多平台支持
 // ===========================================
 export const LLM_CONFIG = {
-  endpoint: process.env.LLM_API_ENDPOINT || 'https://api.suanli.cn/v1',
-  apiKey: process.env.LLM_API_KEY || '',
-  model: process.env.LLM_MODEL || 'free:Qwen3-30B-A3B',
-  timeout: parseInt(process.env.LLM_TIMEOUT || '60000'),
-  maxRetries: parseInt(process.env.LLM_MAX_RETRIES || '3')
+  // 主要服务配置 (Suanli.cn - Qwen3)
+  primary: {
+    endpoint: process.env.LLM_PRIMARY_ENDPOINT || 'https://api.suanli.cn/v1',
+    apiKey: process.env.LLM_PRIMARY_API_KEY || '',
+    model: process.env.LLM_PRIMARY_MODEL || 'free:Qwen3-30B-A3B',
+    name: 'Qwen3-30B'
+  },
+  // 备用服务配置 (DeepSeek)
+  backup: {
+    endpoint: process.env.LLM_BACKUP_ENDPOINT || 'https://api.deepseek.com',
+    apiKey: process.env.LLM_BACKUP_API_KEY || '',
+    model: process.env.LLM_BACKUP_MODEL || 'deepseek-chat',
+    name: 'DeepSeek'
+  },
+  // 通用配置
+  timeout: parseInt(process.env.LLM_TIMEOUT || '30000'),
+  maxRetries: parseInt(process.env.LLM_MAX_RETRIES || '2'),
+  enableFallback: process.env.LLM_ENABLE_FALLBACK === 'true'
 } as const;
 
 // ===========================================
@@ -170,7 +183,7 @@ export class ConfigValidator {
       console.log(`❌ 缺失变量: ${emailValidation.missingVars.join(', ')}`);
     }
     
-    console.log(`🤖 LLM服务: ${LLM_CONFIG.endpoint}`);
+    console.log(`🤖 LLM主要服务: ${LLM_CONFIG.primary.endpoint}`);
     console.log(`📧 邮件服务: ${EMAIL_CONFIG.service}`);
     console.log(`🔧 运行环境: ${APP_CONFIG.env}`);
   }

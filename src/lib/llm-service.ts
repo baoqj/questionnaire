@@ -155,54 +155,109 @@ export class LLMService {
     return formattedAnswers;
   }
 
-  // 调用LLM API (优化版本)
-  async callLLM(systemPrompt: string, userPrompt: string): Promise<string> {
+  // 🔥 新增：多平台LLM调用方法
+  async callLLMWithFallback(systemPrompt: string, userPrompt: string): Promise<{ content: string; provider: string }> {
     const startTime = Date.now();
-    console.log('🚀 开始LLM API调用...');
+    console.log('🤖 开始多平台LLM调用...');
 
+    // 首先尝试主要服务
     try {
-      const response = await fetch(`${LLM_CONFIG.endpoint}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${LLM_CONFIG.apiKey}`
-        },
-        body: JSON.stringify({
-          model: LLM_CONFIG.model,
-          messages: [
-            {
-              role: 'system',
-              content: systemPrompt
-            },
-            {
-              role: 'user',
-              content: userPrompt
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 1500,  // 🔥 优化1: 减少token数量 (2000→1500)
-          stream: false,     // 🔥 优化2: 确保非流式响应
-          top_p: 0.9,       // 🔥 优化3: 添加top_p参数提高响应速度
-          frequency_penalty: 0.1  // 🔥 优化4: 减少重复内容
-        }),
-        signal: AbortSignal.timeout(LLM_CONFIG.timeout)  // 🔥 优化5: 使用环境变量配置超时
-      });
+      console.log(`🎯 尝试主要服务: ${LLM_CONFIG.primary.name}`);
+      const content = await this.callSingleLLM(
+        LLM_CONFIG.primary.endpoint,
+        LLM_CONFIG.primary.apiKey,
+        LLM_CONFIG.primary.model,
+        systemPrompt,
+        userPrompt
+      );
 
-      const fetchTime = Date.now() - startTime;
-      console.log(`📡 LLM API响应时间: ${fetchTime}ms`);
+      const duration = Date.now() - startTime;
+      console.log(`✅ 主要服务调用成功 (${duration}ms)`);
+      return { content, provider: LLM_CONFIG.primary.name };
+    } catch (primaryError) {
+      console.warn(`⚠️ 主要服务失败:`, primaryError);
 
-      if (!response.ok) {
-        throw new Error(`LLM API error: ${response.status} ${response.statusText}`);
+      // 如果启用了fallback，尝试备用服务
+      if (LLM_CONFIG.enableFallback && LLM_CONFIG.backup.apiKey) {
+        try {
+          console.log(`🔄 尝试备用服务: ${LLM_CONFIG.backup.name}`);
+          const content = await this.callSingleLLM(
+            LLM_CONFIG.backup.endpoint,
+            LLM_CONFIG.backup.apiKey,
+            LLM_CONFIG.backup.model,
+            systemPrompt,
+            userPrompt
+          );
+
+          const duration = Date.now() - startTime;
+          console.log(`✅ 备用服务调用成功 (${duration}ms)`);
+          return { content, provider: LLM_CONFIG.backup.name };
+        } catch (backupError) {
+          console.error(`❌ 备用服务也失败:`, backupError);
+          throw new Error(`所有LLM服务都失败了。主要服务: ${primaryError}; 备用服务: ${backupError}`);
+        }
+      } else {
+        throw primaryError;
       }
+    }
+  }
 
-      const data = await response.json();
-      const totalTime = Date.now() - startTime;
-      console.log(`✅ LLM API总耗时: ${totalTime}ms`);
+  // 单个LLM服务调用
+  private async callSingleLLM(
+    endpoint: string,
+    apiKey: string,
+    model: string,
+    systemPrompt: string,
+    userPrompt: string
+  ): Promise<string> {
+    const response = await fetch(`${endpoint}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt
+          },
+          {
+            role: 'user',
+            content: userPrompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 1500,
+        stream: false,
+        top_p: 0.9,
+        frequency_penalty: 0.1
+      }),
+      signal: AbortSignal.timeout(LLM_CONFIG.timeout)
+    });
 
-      return data.choices[0]?.message?.content || '';
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unknown error');
+      throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response format from LLM API');
+    }
+
+    return data.choices[0].message.content || '';
+  }
+
+  // 调用LLM API (优化版本) - 保持向后兼容
+  async callLLM(systemPrompt: string, userPrompt: string): Promise<string> {
+    try {
+      const result = await this.callLLMWithFallback(systemPrompt, userPrompt);
+      return result.content;
     } catch (error) {
-      const totalTime = Date.now() - startTime;
-      console.error(`❌ LLM API调用失败 (耗时: ${totalTime}ms):`, error);
+      console.error('❌ 所有LLM服务都失败了:', error);
       throw error;
     }
   }
@@ -228,28 +283,96 @@ export class LLMService {
     return cleaned;
   }
 
-  // 解析AI响应
-  private parseAIResponse(aiResponse: string): Partial<AIAnalysisResult> {
-    try {
-      // 先清理文本
-      const cleanedResponse = this.cleanText(aiResponse);
+  // 提取JSON内容
+  private extractJSON(text: string): any | null {
+    // 方法1: 寻找完整的JSON对象
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        return JSON.parse(jsonMatch[0]);
+      } catch (e) {
+        console.log('JSON解析方法1失败，尝试方法2');
+      }
+    }
 
-      // 尝试解析JSON格式的响应
-      const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        // 清理解析后的文本内容
-        if (parsed.summary) parsed.summary = this.cleanText(parsed.summary);
-        if (parsed.suggestions && Array.isArray(parsed.suggestions)) {
-          parsed.suggestions = parsed.suggestions.map((s: string) => this.cleanText(s));
+    // 方法2: 寻找第一个{到最后一个}
+    const firstBrace = text.indexOf('{');
+    const lastBrace = text.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      try {
+        const jsonStr = text.substring(firstBrace, lastBrace + 1);
+        return JSON.parse(jsonStr);
+      } catch (e) {
+        console.log('JSON解析方法2失败');
+      }
+    }
+
+    return null;
+  }
+
+  // 验证和标准化结果
+  private validateAndNormalizeResult(result: any): Partial<AIAnalysisResult> {
+    const normalized: Partial<AIAnalysisResult> = {};
+
+    // 验证和标准化风险评分
+    if (result.riskScores && typeof result.riskScores === 'object') {
+      normalized.riskScores = {
+        金融账户: 3,
+        控制人: 3,
+        结构: 3,
+        合规: 3,
+        税务: 3
+      };
+
+      const expectedKeys: (keyof typeof normalized.riskScores)[] = ['金融账户', '控制人', '结构', '合规', '税务'];
+
+      for (const key of expectedKeys) {
+        const score = result.riskScores[key];
+        if (typeof score === 'number' && score >= 1 && score <= 5) {
+          normalized.riskScores[key] = Math.round(score);
         }
-        return parsed;
+        // 如果不是有效数字，保持默认值3
+      }
+    }
+
+    // 验证和标准化建议
+    if (Array.isArray(result.suggestions)) {
+      normalized.suggestions = result.suggestions
+        .filter((s: any) => typeof s === 'string' && s.trim().length > 0)
+        .map((s: string) => this.cleanText(s))
+        .slice(0, 5); // 最多5条建议
+    }
+
+    // 验证和标准化总结
+    if (typeof result.summary === 'string' && result.summary.trim().length > 0) {
+      normalized.summary = this.cleanText(result.summary.trim());
+    }
+
+    return normalized;
+  }
+
+  // 🔥 改进的AI响应解析
+  private parseAIResponse(aiResponse: string): Partial<AIAnalysisResult> {
+    console.log('🔍 开始解析AI响应...');
+    console.log('📝 原始响应长度:', aiResponse.length);
+
+    try {
+      // 清理响应文本
+      const cleanedResponse = this.cleanText(aiResponse);
+      console.log('🧹 清理后响应:', cleanedResponse.substring(0, 200) + '...');
+
+      // 尝试多种JSON提取方法
+      const jsonResult = this.extractJSON(cleanedResponse);
+      if (jsonResult) {
+        console.log('✅ JSON解析成功');
+        return this.validateAndNormalizeResult(jsonResult);
       }
 
-      // 如果不是JSON，尝试解析文本格式
+      // 如果JSON解析失败，尝试文本解析
+      console.log('⚠️ JSON解析失败，尝试文本解析');
       return this.parseTextResponse(cleanedResponse);
     } catch (error) {
-      console.error('Error parsing AI response:', error);
+      console.error('❌ AI响应解析失败:', error);
       return this.parseTextResponse(this.cleanText(aiResponse));
     }
   }
@@ -361,11 +484,12 @@ export class LLMService {
       // 🔥 优化7: 简化prompt内容，减少token消耗
       const analysisPrompt = this.optimizePrompt(selectedPrompt.analysisPrompt, formattedAnswers);
 
-      // 调用LLM
-      const aiResponse = await this.callLLM(selectedPrompt.systemPrompt, analysisPrompt);
+      // 调用LLM (使用多平台容错)
+      const llmResult = await this.callLLMWithFallback(selectedPrompt.systemPrompt, analysisPrompt);
+      console.log(`🎯 使用的LLM提供商: ${llmResult.provider}`);
 
       // 解析响应
-      const parsedResult = this.parseAIResponse(aiResponse);
+      const parsedResult = this.parseAIResponse(llmResult.content);
 
       // 构建最终结果
       const result: AIAnalysisResult = {
@@ -378,7 +502,7 @@ export class LLMService {
         },
         suggestions: parsedResult.suggestions || ['请咨询专业的CRS合规顾问获取个性化建议。'],
         summary: parsedResult.summary || '基于您的回答，我们为您生成了CRS合规风险分析报告。',
-        promptUsed: selectedPrompt.id
+        promptUsed: `${selectedPrompt.id} (${llmResult.provider})`
       };
 
       const totalTime = Date.now() - startTime;
@@ -392,7 +516,19 @@ export class LLMService {
       const totalTime = Date.now() - startTime;
       console.error(`❌ AI分析失败 (耗时: ${totalTime}ms):`, error);
 
-      // 返回fallback结果
+      // 🔥 改进的fallback结果，包含错误信息
+      const errorMessage = error instanceof Error ? error.message : '未知错误';
+      const isNetworkError = errorMessage.includes('fetch') || errorMessage.includes('timeout') || errorMessage.includes('network');
+      const isAPIError = errorMessage.includes('HTTP') || errorMessage.includes('API');
+
+      let fallbackSummary = '由于技术原因，无法生成详细分析。';
+      if (isNetworkError) {
+        fallbackSummary += '网络连接可能存在问题，请稍后重试。';
+      } else if (isAPIError) {
+        fallbackSummary += 'AI服务暂时不可用，请稍后重试。';
+      }
+      fallbackSummary += '建议咨询专业顾问获取个性化建议。';
+
       return {
         riskScores: {
           金融账户: 3,
@@ -402,12 +538,14 @@ export class LLMService {
           税务: 3
         },
         suggestions: [
-          '建议咨询专业的CRS合规顾问',
-          '定期关注相关法规变化',
-          '建立完善的合规管理体系'
+          '建议咨询专业的CRS合规顾问获取个性化建议',
+          '定期关注CRS相关法规的更新和变化',
+          '建立完善的合规管理体系和内控制度',
+          '保持良好的文档记录和申报习惯',
+          '如问题持续，请检查网络连接或联系技术支持'
         ],
-        summary: '由于技术原因，无法生成详细分析。建议咨询专业顾问获取个性化建议。',
-        promptUsed: 'fallback'
+        summary: fallbackSummary,
+        promptUsed: `fallback (错误: ${errorMessage.substring(0, 100)})`
       };
     }
   }
