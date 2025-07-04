@@ -369,7 +369,7 @@ function ResultContent() {
             {/* 传统的风险因素、合规缺口、建议 */}
             {feedback.metadata?.detailedAnalysis && (
               <div className="space-y-6">
-                {feedback.metadata.detailedAnalysis.riskFactors?.length > 0 && (
+                {feedback.metadata.detailedAnalysis.riskFactors && feedback.metadata.detailedAnalysis.riskFactors.length > 0 && (
                   <div>
                     <h4 className="font-semibold text-gray-800 mb-3">风险因素</h4>
                     <ul className="space-y-2">
@@ -383,7 +383,7 @@ function ResultContent() {
                   </div>
                 )}
 
-                {feedback.metadata.detailedAnalysis.complianceGaps?.length > 0 && (
+                {feedback.metadata.detailedAnalysis.complianceGaps && feedback.metadata.detailedAnalysis.complianceGaps.length > 0 && (
                   <div>
                     <h4 className="font-semibold text-gray-800 mb-3">合规缺口</h4>
                     <ul className="space-y-2">
@@ -397,7 +397,7 @@ function ResultContent() {
                   </div>
                 )}
 
-                {feedback.metadata.detailedAnalysis.recommendations?.length > 0 && (
+                {feedback.metadata.detailedAnalysis.recommendations && feedback.metadata.detailedAnalysis.recommendations.length > 0 && (
                   <div>
                     <h4 className="font-semibold text-gray-800 mb-3">专业建议</h4>
                     <ul className="space-y-2">
@@ -440,11 +440,11 @@ function ResultContent() {
               )}
 
               {/* 兼容性：显示传统优化建议（如果新结构不存在） */}
-              {!feedback.metadata.summaryAndSuggestions.professionalAdvice && feedback.metadata.summaryAndSuggestions.optimizationSuggestions?.length > 0 && (
+              {!feedback.metadata.summaryAndSuggestions.professionalAdvice && feedback.metadata.summaryAndSuggestions.optimizationSuggestions && feedback.metadata.summaryAndSuggestions.optimizationSuggestions.length > 0 && (
                 <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-400 p-6 rounded-r-lg">
                   <h4 className="font-semibold text-indigo-800 mb-3">专业建议</h4>
                   <ul className="space-y-2">
-                    {feedback.metadata.summaryAndSuggestions.optimizationSuggestions.map((suggestion, index) => (
+                    {feedback.metadata.summaryAndSuggestions.optimizationSuggestions!.map((suggestion, index) => (
                       <li key={index} className="flex items-start">
                         <span className="w-2 h-2 bg-indigo-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
                         <span className="text-indigo-700 text-sm">{suggestion}</span>

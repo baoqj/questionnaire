@@ -273,7 +273,7 @@ export class LLMTester {
    */
   static generateReport(results: any): string {
     let report = '🧪 LLM API 测试报告\n';
-    report += '=' * 50 + '\n\n';
+    report += '='.repeat(50) + '\n\n';
 
     // 配置验证
     const configValidation = this.validateConfig();
